@@ -56,6 +56,13 @@
 # 🔗 References
   - Dataset description and structure as per the project documentation.
 
+# 📁 Repository Structure
+├── data/                        # Contains dataset files
+
+├── notebooks/                   # Jupyter Notebooks for data exploration and model development
+
+└── README.md                    # Project overview and instructions
+
 # 🚀 Conclusion
   This project demonstrated the use of machine learning models to predict hazardous NEOs. By addressing data imbalance and using appropriate evaluation metrics, the project 
   successfully identified the best model for the task.
