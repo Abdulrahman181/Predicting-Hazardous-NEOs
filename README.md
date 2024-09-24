@@ -1,6 +1,6 @@
 ### Hazardous Near Earth Objects (NEOs) Forecasting Project
 
-# 📌 Project Overview
+# 🎯 Project Overview
   - This project aims to develop a machine learning model to predict whether near-Earth objects (NEOs) are dangerous or not.
   -  We use a real dataset from NASA that includes information on objects observed between 1910 and 2024.
 
