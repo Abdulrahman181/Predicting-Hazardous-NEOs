@@ -1,4 +1,4 @@
-### Hazardous Near Earth Objects (NEOs) Forecasting Project
+## Hazardous Near Earth Objects (NEOs) Forecasting Project
 
 # 🎯 Project Overview
   - This project aims to develop a machine learning model to predict whether near-Earth objects (NEOs) are dangerous or not.
