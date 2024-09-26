@@ -10,8 +10,14 @@
   -  This mission is vital to planetary defense efforts.
 
 # 🛠️ Project Requirements
- - Python 3.x
- - Libraries: pandas, numpy, scikit-learn, matplotlib, seaborn, matplotlib.pyplot
+  - Python 3.x
+  - Libraries:
+    - pandas
+    - numpy
+    - scikit-learn
+    - matplotlib
+    - seaborn
+    - matplotlib.pyplot
 
 # 🧰 Project Steps
   - Data Importing and Cleaning
@@ -29,47 +35,49 @@
   - Model Training and Evaluation
 
 # 💡Results and Analysis
-   Trained multiple machine learning models including:
+  - Trained multiple machine learning models including:
     - Random Forest
     - Logistic Regression
     - Decision Tree 
   
    - Evaluated model performance using:
-   - Precision, Recall, F1-Score
-   - AUC-ROC Curve
-   - Balanced Accuracy
-   - Selected the best-performing model based on these metrics.
+    - Precision, Recall, F1-Score
+    - AUC-ROC Curve
+    - Balanced Accuracy
+    - Selected the best-performing model based on these metrics.
 
    - Best Model: Random Forest
-   - Balanced Accuracy
-   - Precision
-   - Recall
-   - F1-Score
-   - AUC-ROC
+    - Balanced Accuracy
+    - Precision
+    - Recall
+    - F1-Score
+    - AUC-ROC
+     
 ## - Based on the model's predictions, we can enhance hazardous object detection and improve classification accuracy.
 
 ## 🔍 Key Findings and Insights
-  - The dataset was highly imbalanced, with far fewer hazardous objects compared to non-hazardous ones.
-  - The Random Forest model provided the best performance, handling the class imbalance effectively.
-  - Balanced accuracy was a key metric in evaluating the performance of the model due to the imbalance in the target variabl
+   - The dataset was highly imbalanced, with far fewer hazardous objects compared to non-hazardous ones.
+   - The Random Forest model provided the best performance, handling the class imbalance effectively.
+   - Balanced accuracy was a key metric in evaluating the performance of the model due to the imbalance in the target variabl
 
 # 🔗 References
   - Dataset description and structure as per the project documentation.
 
 # 📁 Repository Structure
-├── data/                        # Contains dataset files
 
-├── notebooks/                   # Jupyter Notebooks for data exploration and model development
+├── data                       
 
-└── README.md                    # Project overview and instructions
+├── notebooks   
+
+└── README.md
 
 # 🚀 Conclusion
-  This project demonstrated the use of machine learning models to predict hazardous NEOs. By addressing data imbalance and using appropriate evaluation metrics, the project 
-  successfully identified the best model for the task.
+  -This project demonstrated the use of machine learning models to predict hazardous NEOs.
+  -By addressing data imbalance and using appropriate evaluation metrics, the project successfully identified the best model for the task.
 
 # 💻 Contact
-  - Abdul Rahman Ahmed 
-  - abdulrahmannassar202@gmail.com
+   - Abdul Rahman Ahmed 
+   - abdulrahmannassar202@gmail.com
 
 # 📌 Project link:
    - https://github.com/Abdulrahman181/Predicting-Hazardous-NEOs
