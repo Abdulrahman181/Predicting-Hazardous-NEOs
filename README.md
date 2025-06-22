@@ -1,15 +1,15 @@
 ## Hazardous Near Earth Objects (NEOs) Forecasting Project
 
-# 🎯 Project Overview
+#  Project Overview
   - This project aims to develop a machine learning model to predict whether near-Earth objects (NEOs) are dangerous or not.
   -  We use a real dataset from NASA that includes information on objects observed between 1910 and 2024.
 
-# 📁 Project description
+#  Project description
   - This project analyzes data on 338,199 space objects observed near Earth.
   - Our goal is to build a model that can accurately predict whether an object is classified as “dangerous” by NASA.
   -  This mission is vital to planetary defense efforts.
 
-# 🛠️ Project Requirements
+#   Project Requirements
   - Python 3.x
   - Libraries:
     - pandas
@@ -19,7 +19,7 @@
     - seaborn
     - matplotlib.pyplot
 
-# 🧰 Project Steps
+#  Project Steps
   - Data Importing and Cleaning
   - Imported the dataset and handled missing values to ensure the data is clean and ready for analysis.
   - Exploratory Data Analysis (EDA)
@@ -34,7 +34,7 @@
   - Used Balanced Accuracy as a performance metric.
   - Model Training and Evaluation
 
-# 💡Results and Analysis
+# Results and Analysis
   - Trained multiple machine learning models including:
     - Random Forest
     - Logistic Regression
@@ -55,15 +55,15 @@
      
 ## - Based on the model's predictions, we can enhance hazardous object detection and improve classification accuracy.
 
-## 🔍 Key Findings and Insights
+##  Key Findings and Insights
    - The dataset was highly imbalanced, with far fewer hazardous objects compared to non-hazardous ones.
    - The Random Forest model provided the best performance, handling the class imbalance effectively.
    - Balanced accuracy was a key metric in evaluating the performance of the model due to the imbalance in the target variabl
 
-# 🔗 References
+#  References
   - Dataset description and structure as per the project documentation.
 
-# 📁 Repository Structure
+#  Repository Structure
 
 ├── data                       
 
@@ -71,13 +71,13 @@
 
 └── README.md
 
-# 🚀 Conclusion
+#  Conclusion
   -This project demonstrated the use of machine learning models to predict hazardous NEOs.
   -By addressing data imbalance and using appropriate evaluation metrics, the project successfully identified the best model for the task.
 
-# 💻 Contact
+#  Contact
    - Abdul Rahman Ahmed 
    - abdulrahmannassar202@gmail.com
 
-# 📌 Project link:
+#  Project link:
    - https://github.com/Abdulrahman181/Predicting-Hazardous-NEOs
