@@ -1,83 +1,38 @@
-## Hazardous Near Earth Objects (NEOs) Forecasting Project
+# Hazardous Near-Earth Objects (NEOs)
 
-#  Project Overview
-  - This project aims to develop a machine learning model to predict whether near-Earth objects (NEOs) are dangerous or not.
-  -  We use a real dataset from NASA that includes information on objects observed between 1910 and 2024.
+This repository contains an exploratory notebook for classifying whether a near-Earth object (NEO) is labeled hazardous in the referenced dataset. It is a machine-learning exercise, not an operational planetary-defense system.
 
-#  Project description
-  - This project analyzes data on 338,199 space objects observed near Earth.
-  - Our goal is to build a model that can accurately predict whether an object is classified as “dangerous” by NASA.
-  -  This mission is vital to planetary defense efforts.
+## Repository contents
 
-#   Project Requirements
-  - Python 3.x
-  - Libraries:
-    - pandas
-    - numpy
-    - scikit-learn
-    - matplotlib
-    - seaborn
-    - matplotlib.pyplot
+- `Project_NEOs.ipynb` — exploratory data analysis and several baseline model experiments.
+- `NASA_Data.txt` — URL to the dataset source; it is not a copy of the data.
 
-#  Project Steps
-  - Data Importing and Cleaning
-  - Imported the dataset and handled missing values to ensure the data is clean and ready for analysis.
-  - Exploratory Data Analysis (EDA)
-  - Explored the dataset using visualization libraries like Matplotlib and Seaborn.
-  - Generated informative graphs to identify patterns, trends, and potential correlations.
-  - Data Preprocessing
-  - Selected important features for model training.
-  - Encoded categorical variables and normalized numerical features.
-  - Addressed class imbalance using techniques such as:
-  - SMOTE (Synthetic Minority Over-sampling Technique) for oversampling.
-  - Class Weight Adjustment.
-  - Used Balanced Accuracy as a performance metric.
-  - Model Training and Evaluation
+The CSV dataset is **not included** in this repository. No model artifact or independently verified performance result is provided.
 
-# Results and Analysis
-  - Trained multiple machine learning models including:
-    - Random Forest
-    - Logistic Regression
-    - Decision Tree 
-  
-   - Evaluated model performance using:
-    - Precision, Recall, F1-Score
-    - AUC-ROC Curve
-    - Balanced Accuracy
-    - Selected the best-performing model based on these metrics.
+## Obtain the dataset
 
-   - Best Model: Random Forest
-    - Balanced Accuracy
-    - Precision
-    - Recall
-    - F1-Score
-    - AUC-ROC
-     
-## - Based on the model's predictions, we can enhance hazardous object detection and improve classification accuracy.
+1. Visit the [Kaggle dataset page](https://www.kaggle.com/datasets/ivansher/nasa-nearest-earth-objects-1910-2024/data) and obtain the CSV according to Kaggle's access and data-use terms.
+2. Save the downloaded file in the repository root with this exact name: `nearest-earth-objects(1910-2024).csv`.
+3. Do not commit Kaggle credentials, API tokens, or private account configuration. This project does not require credentials embedded in the notebook.
 
-##  Key Findings and Insights
-   - The dataset was highly imbalanced, with far fewer hazardous objects compared to non-hazardous ones.
-   - The Random Forest model provided the best performance, handling the class imbalance effectively.
-   - Balanced accuracy was a key metric in evaluating the performance of the model due to the imbalance in the target variabl
+The notebook checks for the expected local file and raises an explanatory error if it is absent.
 
-#  References
-  - Dataset description and structure as per the project documentation.
+## Run the notebook
 
-#  Repository Structure
+Use Python with Jupyter and the libraries imported by the notebook: `pandas`, `numpy`, `matplotlib`, `seaborn`, `scikit-learn`, and `imbalanced-learn`.
 
-├── data                       
+For example, in a fresh Python environment:
 
-├── notebooks   
+```bash
+python -m pip install jupyter pandas numpy matplotlib seaborn scikit-learn imbalanced-learn
+jupyter notebook Project_NEOs.ipynb
+```
 
-└── README.md
+Run Jupyter from the repository root so the relative dataset path resolves. The repository does not currently pin dependency versions; results can vary with package versions. Restart the kernel and run cells in order after obtaining the dataset.
 
-#  Conclusion
-  -This project demonstrated the use of machine learning models to predict hazardous NEOs.
-  -By addressing data imbalance and using appropriate evaluation metrics, the project successfully identified the best model for the task.
+## Limitations
 
-#  Contact
-   - Abdul Rahman Ahmed 
-   - abdulrahmannassar202@gmail.com
-
-#  Project link:
-   - https://github.com/Abdulrahman181/Predicting-Hazardous-NEOs
+- The source CSV is absent, so a clean checkout cannot run the analysis end-to-end without a manual download.
+- The notebook contains exploratory, incrementally developed experiments. Its saved cell outputs have been cleared; reported metrics must be regenerated and reviewed against the downloaded data and current environment.
+- This repository does not provide a validated model, a production inference workflow, or evidence that any reported performance generalizes beyond the notebook's train/test split. In particular, accuracy alone is not sufficient for judging hazardous-object detection.
+- No test suite or data-validation pipeline is currently included.
