@@ -1,83 +1,72 @@
-## Hazardous Near Earth Objects (NEOs) Forecasting Project
+# Predicting Hazardous Near-Earth Objects
 
-#  Project Overview
-  - This project aims to develop a machine learning model to predict whether near-Earth objects (NEOs) are dangerous or not.
-  -  We use a real dataset from NASA that includes information on objects observed between 1910 and 2024.
+This repository contains a reproducible scikit-learn baseline for classifying whether a near-Earth object (NEO) is marked hazardous in the NASA/Kaggle source dataset referenced by [`NASA_Data.txt`](NASA_Data.txt).
 
-#  Project description
-  - This project analyzes data on 338,199 space objects observed near Earth.
-  - Our goal is to build a model that can accurately predict whether an object is classified as “dangerous” by NASA.
-  -  This mission is vital to planetary defense efforts.
+> **Data and results status:** The CSV is not committed to this repository, and no model metrics are committed. Training stops with an actionable error when the CSV is absent; this audit therefore does not claim a completed training run.
 
-#   Project Requirements
-  - Python 3.x
-  - Libraries:
-    - pandas
-    - numpy
-    - scikit-learn
-    - matplotlib
-    - seaborn
-    - matplotlib.pyplot
+## Repository contents
 
-#  Project Steps
-  - Data Importing and Cleaning
-  - Imported the dataset and handled missing values to ensure the data is clean and ready for analysis.
-  - Exploratory Data Analysis (EDA)
-  - Explored the dataset using visualization libraries like Matplotlib and Seaborn.
-  - Generated informative graphs to identify patterns, trends, and potential correlations.
-  - Data Preprocessing
-  - Selected important features for model training.
-  - Encoded categorical variables and normalized numerical features.
-  - Addressed class imbalance using techniques such as:
-  - SMOTE (Synthetic Minority Over-sampling Technique) for oversampling.
-  - Class Weight Adjustment.
-  - Used Balanced Accuracy as a performance metric.
-  - Model Training and Evaluation
+- `neos_pipeline.py` — validated data loading, leakage-safe preprocessing, two deterministic baseline pipelines, and evaluation.
+- `Project_NEOs.ipynb` — a clean, output-free walkthrough that calls the same pipeline.
+- `tests/test_engineering.py` — static/notebook and missing-data guard tests.
+- `NASA_Data.txt` — the original source URL; it is not the dataset itself.
+- `ENGINEERING_REVIEW.md` — audit findings and validation record.
 
-# Results and Analysis
-  - Trained multiple machine learning models including:
-    - Random Forest
-    - Logistic Regression
-    - Decision Tree 
-  
-   - Evaluated model performance using:
-    - Precision, Recall, F1-Score
-    - AUC-ROC Curve
-    - Balanced Accuracy
-    - Selected the best-performing model based on these metrics.
+## Requirements
 
-   - Best Model: Random Forest
-    - Balanced Accuracy
-    - Precision
-    - Recall
-    - F1-Score
-    - AUC-ROC
-     
-## - Based on the model's predictions, we can enhance hazardous object detection and improve classification accuracy.
+Python 3.10+ is supported. Install the pinned dependency ranges in an isolated environment:
 
-##  Key Findings and Insights
-   - The dataset was highly imbalanced, with far fewer hazardous objects compared to non-hazardous ones.
-   - The Random Forest model provided the best performance, handling the class imbalance effectively.
-   - Balanced accuracy was a key metric in evaluating the performance of the model due to the imbalance in the target variabl
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+```
 
-#  References
-  - Dataset description and structure as per the project documentation.
+## Obtain the data
 
-#  Repository Structure
+Download the CSV from the source URL in `NASA_Data.txt` (the Kaggle dataset commonly named `nearest-earth-objects(1910-2024).csv`). Do not commit the downloaded data. Either set an explicit path:
 
-├── data                       
+```bash
+export NEO_DATA_PATH=/absolute/path/to/nearest-earth-objects-1910-2024.csv
+```
 
-├── notebooks   
+or place it at `data/nearest-earth-objects-1910-2024.csv` (the `data/` directory is ignored by Git).
 
-└── README.md
+The loader requires these columns: `absolute_magnitude`, `estimated_diameter_min`, `estimated_diameter_max`, `relative_velocity`, `miss_distance`, and binary `is_hazardous`. Identifier columns (`neo_id`, `name`, and `orbiting_body`) are excluded from modelling.
 
-#  Conclusion
-  -This project demonstrated the use of machine learning models to predict hazardous NEOs.
-  -By addressing data imbalance and using appropriate evaluation metrics, the project successfully identified the best model for the task.
+## Run
 
-#  Contact
-   - Abdul Rahman Ahmed 
-   - abdulrahmannassar202@gmail.com
+The command below trains the logistic-regression and random-forest baselines and prints a JSON result. It performs no run when the data file is missing; instead it explains how to provide it.
 
-#  Project link:
-   - https://github.com/Abdulrahman181/Predicting-Hazardous-NEOs
+```bash
+python -c "from neos_pipeline import run_experiment; import json; print(json.dumps(run_experiment(), indent=2))"
+```
+
+To open the notebook:
+
+```bash
+jupyter notebook Project_NEOs.ipynb
+```
+
+## Methodology safeguards
+
+- A stratified, fixed-seed train/test split is created before any learned preprocessing.
+- Median imputation and (for logistic regression) standardisation are fitted inside scikit-learn `Pipeline` objects on training data only.
+- Class imbalance is handled with `class_weight='balanced'`; oversampling is not applied to the full dataset.
+- Metrics include accuracy, balanced accuracy, precision, recall, F1, and ROC AUC. No metric is reported here because the source CSV is not present in this checkout.
+- Random seeds are explicit (`42`) for the split and estimators. Reproducibility still depends on library versions and hardware.
+
+## Validation
+
+Run static checks and tests from the repository root:
+
+```bash
+ruff check .
+pytest -q
+```
+
+The notebook is intentionally saved without stale execution outputs. Tests verify that every code cell parses and that missing data fails clearly; a full model run requires the real CSV and installed runtime dependencies.
+
+## Limitations
+
+This is a baseline classification experiment, not a planetary-defence decision system. The source labels, feature definitions, temporal coverage, and possible duplicate observations should be independently verified before scientific or operational use. A future study should use a time-aware or object-grouped holdout if the data contains repeated observations, and should tune thresholds using a validation set rather than the test set.
