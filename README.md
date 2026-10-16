@@ -32,7 +32,7 @@ export NEO_DATA_PATH=/absolute/path/to/nearest-earth-objects-1910-2024.csv
 
 or place it at `data/nearest-earth-objects-1910-2024.csv` (the `data/` directory is ignored by Git).
 
-The loader requires these columns: `absolute_magnitude`, `estimated_diameter_min`, `estimated_diameter_max`, `relative_velocity`, `miss_distance`, and binary `is_hazardous`. Identifier columns (`neo_id`, `name`, and `orbiting_body`) are excluded from modelling.
+ The loader requires these columns: `absolute_magnitude`, `estimated_diameter_min`, `estimated_diameter_max`, `relative_velocity`, `miss_distance`, and binary `is_hazardous`. Identifier columns (`neo_id`, `name`, and `orbiting_body`) are excluded from modelling. Missing feature values may be imputed by the training pipelines; missing targets, infinite values, and all-missing features are rejected.
 
 ## Run
 
@@ -50,11 +50,11 @@ jupyter notebook Project_NEOs.ipynb
 
 ## Methodology safeguards
 
-- A stratified, fixed-seed train/test split is created before any learned preprocessing.
+- A stratified, fixed-seed train/test split is created before any learned preprocessing. The split contract rejects invalid proportions and datasets too small to retain both classes in both partitions.
 - Median imputation and (for logistic regression) standardisation are fitted inside scikit-learn `Pipeline` objects on training data only.
 - Class imbalance is handled with `class_weight='balanced'`; oversampling is not applied to the full dataset.
 - Metrics include accuracy, balanced accuracy, precision, recall, F1, and ROC AUC. No metric is reported here because the source CSV is not present in this checkout.
-- Random seeds are explicit (`42`) for the split and estimators. Reproducibility still depends on library versions and hardware.
+- Random seeds are explicit (`42` by default) for the split and estimators; a caller-provided integer is propagated to both. Reproducibility still depends on library versions and hardware.
 
 ## Validation
 
@@ -65,8 +65,8 @@ ruff check .
 pytest -q
 ```
 
-The notebook is intentionally saved without stale execution outputs. Tests verify that every code cell parses and that missing data fails clearly; a full model run requires the real CSV and installed runtime dependencies.
+The notebook is intentionally saved without stale execution outputs. Tests verify that every code cell parses, that missing data and invalid schema values fail clearly, and that a small synthetic fixture exercises both model pipelines. A full model run requires the real CSV and installed runtime dependencies.
 
 ## Limitations
 
-This is a baseline classification experiment, not a planetary-defence decision system. The source labels, feature definitions, temporal coverage, and possible duplicate observations should be independently verified before scientific or operational use. A future study should use a time-aware or object-grouped holdout if the data contains repeated observations, and should tune thresholds using a validation set rather than the test set.
+This is a baseline classification experiment, not a planetary-defence decision system. The source labels, feature definitions, temporal coverage, and possible duplicate observations should be independently verified before scientific or operational use. The current split is stratified and row-based; it does not claim object-grouped or time-aware generalisation when repeated objects or temporal drift are present. A future study should use a time-aware or object-grouped holdout and tune thresholds using a validation set rather than the test set. No serialized model or production inference API is provided.

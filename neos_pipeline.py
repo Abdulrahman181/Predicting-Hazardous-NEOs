@@ -7,6 +7,8 @@ The repository intentionally does not include the Kaggle CSV.  Call
 from __future__ import annotations
 
 import os
+import math
+import numbers
 from pathlib import Path
 from typing import Any
 
@@ -41,8 +43,8 @@ DEFAULT_RANDOM_STATE = 42
 
 def resolve_data_path(data_path: str | Path | None = None) -> Path:
     """Return a usable dataset path or fail with an actionable message."""
-    explicit_path = data_path or os.environ.get("NEO_DATA_PATH")
-    if explicit_path:
+    explicit_path = data_path if data_path is not None else os.environ.get("NEO_DATA_PATH")
+    if explicit_path is not None:
         path = Path(explicit_path).expanduser()
         if not path.is_file():
             raise FileNotFoundError(
@@ -72,9 +74,15 @@ def resolve_data_path(data_path: str | Path | None = None) -> Path:
 
 def _normalise_target(target: pd.Series) -> pd.Series:
     """Convert common binary target representations to integer 0/1 values."""
+    if target.isna().any():
+        raise ValueError(
+            f"{TARGET_COLUMN!r} contains missing values; remove or label them before training."
+        )
     if pd.api.types.is_bool_dtype(target):
         return target.astype("int64")
     if pd.api.types.is_numeric_dtype(target):
+        if not target.map(math.isfinite).all():
+            raise ValueError(f"{TARGET_COLUMN!r} must contain only finite values.")
         values = set(target.dropna().unique())
         if not values.issubset({0, 1}):
             raise ValueError(
@@ -133,6 +141,22 @@ def load_dataset(data_path: str | Path | None = None) -> tuple[pd.DataFrame, pd.
             f"Non-numeric feature columns are not supported: {non_numeric}. "
             "Remove or encode them before training."
         )
+    non_finite = [
+        column
+        for column in feature_frame.columns
+        if (~feature_frame[column].dropna().map(math.isfinite)).any()
+    ]
+    if non_finite:
+        raise ValueError(
+            f"Feature columns contain non-finite values: {non_finite}. "
+            "Replace +/-inf with a missing value or remove those rows."
+        )
+    all_missing = [column for column in feature_frame if feature_frame[column].notna().sum() == 0]
+    if all_missing:
+        raise ValueError(
+            f"Feature columns contain no observed values: {all_missing}. "
+            "Provide at least one finite value per feature."
+        )
     if target.nunique() < 2:
         raise ValueError(f"{TARGET_COLUMN!r} must contain both classes for training.")
     return feature_frame, target
@@ -150,8 +174,12 @@ def _preprocessor(feature_names: list[str], *, scale: bool) -> ColumnTransformer
     )
 
 
-def build_models(feature_names: list[str]) -> dict[str, Pipeline]:
+def build_models(
+    feature_names: list[str], *, random_state: int = DEFAULT_RANDOM_STATE
+) -> dict[str, Pipeline]:
     """Build estimators whose preprocessing is fitted only on training data."""
+    if not feature_names:
+        raise ValueError("At least one feature is required to build models.")
     return {
         "logistic_regression": Pipeline(
             [
@@ -161,7 +189,7 @@ def build_models(feature_names: list[str]) -> dict[str, Pipeline]:
                     LogisticRegression(
                         class_weight="balanced",
                         max_iter=1000,
-                        random_state=DEFAULT_RANDOM_STATE,
+                        random_state=random_state,
                     ),
                 ),
             ]
@@ -175,7 +203,7 @@ def build_models(feature_names: list[str]) -> dict[str, Pipeline]:
                         class_weight="balanced",
                         n_estimators=300,
                         n_jobs=-1,
-                        random_state=DEFAULT_RANDOM_STATE,
+                        random_state=random_state,
                     ),
                 ),
             ]
@@ -202,6 +230,23 @@ def run_experiment(
 ) -> dict[str, Any]:
     """Train both baseline models and return test metrics without persistence."""
     X, y = load_dataset(data_path)
+    if isinstance(random_state, bool) or not isinstance(random_state, numbers.Integral):
+        raise ValueError("random_state must be an integer for reproducible experiments.")
+    if isinstance(test_size, bool) or not isinstance(test_size, numbers.Real):
+        raise ValueError("test_size must be a number between 0 and 1.")
+    if not 0 < float(test_size) < 1:
+        raise ValueError("test_size must be strictly between 0 and 1.")
+    class_counts = y.value_counts()
+    if class_counts.min() < 2:
+        raise ValueError(
+            "Each class needs at least two rows for a stratified train/test split."
+        )
+    n_test = math.ceil(len(X) * float(test_size))
+    n_train = len(X) - n_test
+    if n_test < 2 or n_train < 2:
+        raise ValueError(
+            "test_size must leave at least two rows in both train and test splits."
+        )
     X_train, X_test, y_train, y_test = train_test_split(
         X,
         y,
@@ -209,18 +254,22 @@ def run_experiment(
         random_state=random_state,
         stratify=y,
     )
-    if y_test.nunique() < 2:
-        raise ValueError("The test split contains one class; choose a larger test_size.")
+    if y_train.nunique() < 2 or y_test.nunique() < 2:
+        raise ValueError(
+            "Both train and test splits must contain both classes; adjust test_size."
+        )
 
     results: dict[str, Any] = {
         "rows_after_deduplication": len(X),
         "features": list(X.columns),
         "class_counts": {str(key): int(value) for key, value in y.value_counts().sort_index().items()},
-        "test_size": test_size,
+        "test_size": float(test_size),
         "random_state": random_state,
         "metrics": {},
     }
-    for name, estimator in build_models(list(X.columns)).items():
+    for name, estimator in build_models(
+        list(X.columns), random_state=int(random_state)
+    ).items():
         estimator.fit(X_train, y_train)
         predictions = estimator.predict(X_test)
         probabilities = estimator.predict_proba(X_test)[:, 1]

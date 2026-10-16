@@ -48,3 +48,31 @@ A full model training run was **not** claimed: the external CSV is absent from t
 ## Remaining scientific/engineering considerations
 
 The source dataset may contain repeated observations of the same object. Before operational or scientific use, assess object-level grouping and temporal drift; a time-aware or grouped holdout may be more appropriate than a random split. Threshold selection, calibration, error analysis, and independent validation remain future work.
+
+## Second Senior Review
+
+**Date:** 2026-10-16
+**Reviewer scope:** all tracked files, the full notebook, Python pipeline, tests, requirements, README, Git history, and working-tree diff.
+
+### Findings and implemented fixes
+
+- **Target validation was incomplete:** a numeric target containing missing values reached an integer cast and raised an opaque pandas `IntCastingNaNError`. Missing targets now fail with an actionable `ValueError`; non-finite numeric targets are rejected as well.
+- **Feature validation allowed estimator-level failures:** `+/-inf` values and columns with no observed values were not checked before the scikit-learn pipeline. The loader now rejects non-finite values and all-missing features while continuing to allow ordinary missing feature values for training-time median imputation.
+- **Split arguments were under-specified:** invalid `test_size` values and tiny datasets relied on downstream scikit-learn errors. The experiment now validates the numeric range, requires enough rows/classes for both partitions, and verifies both resulting partitions contain both classes.
+- **Seed propagation was inconsistent:** `run_experiment(random_state=...)` changed only the split while model estimators remained fixed at `42`. The caller-provided integer is now passed to both the split and model estimators.
+- **Path handling was ambiguous:** an explicitly supplied empty path could silently fall back to `NEO_DATA_PATH`. Explicit paths now take precedence whenever `data_path` is not `None`.
+- **Regression coverage was too narrow:** tests now cover missing required columns, missing targets, non-finite features, split validation, and a real synthetic run through both model pipelines with metric-schema/range assertions.
+
+No dataset, metric, serialized model, API, or UI was fabricated or added. Notebook code cells remain parseable, output-free, and with null execution counts.
+
+### Validation performed in this review
+
+- `ruff check .` — passed.
+- `pytest -q` — passed (6 tests).
+- Targeted edge-case probes confirmed actionable errors for missing targets, non-finite features, and invalid/tiny split requests.
+- Inspected `git status`, `git log`, tracked paths, Git diff, notebook JSON/state, dependency manifest, and secret/path patterns. No credentials or developer-local absolute paths were found in active project code.
+- A full source-data training run remains intentionally unclaimed because the external CSV is absent from the checkout.
+
+### Risks remaining
+
+The current evaluation is a row-level random stratified holdout. Repeated observations of one NEO can therefore cross the split, and temporal drift is not evaluated; grouped or time-aware validation is required for scientific claims. The source label semantics and feature provenance were not independently verified here. Metrics are threshold-dependent and there is no calibration, uncertainty analysis, external validation, persisted-model loading contract, or production inference API. Dependency ranges are bounded but not lock-file reproducible, and results can vary across supported library versions/hardware.
